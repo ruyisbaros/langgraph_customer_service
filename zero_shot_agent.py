@@ -9,6 +9,9 @@ from langchain_groq import ChatGroq
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, StateGraph, START
+from langgraph.prebuilt import tools_condition, ToolNode
 
 from tools.car_operations import search_car_rentals, book_car_rental, update_car_rental, cancel_car_rental
 from tools.excursion_operations import search_trip_recommendations, book_excursion, update_excursion, cancel_excursion
@@ -98,3 +101,24 @@ part_1_tools = [
 ]
 part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(
     part_1_tools)
+
+##### Define Graph #####
+
+builder = StateGraph(State)
+
+
+# Define nodes: these do the work
+builder.add_node("assistant", Assistant(part_1_assistant_runnable))
+builder.add_node("tools", ToolNode(part_1_tools))
+# Define edges: these determine how the control flow moves
+builder.add_edge(START, "assistant")
+builder.add_conditional_edges(
+    "assistant",
+    tools_condition,
+)
+builder.add_edge("tools", "assistant")
+
+# The checkpointer lets the graph persist its state
+# this is a complete memory for the entire graph.
+memory = MemorySaver()
+part_1_graph = builder.compile(checkpointer=memory)
