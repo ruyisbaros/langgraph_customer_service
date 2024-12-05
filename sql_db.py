@@ -7,7 +7,7 @@ import requests
 # conn = sqlite3.connect('example.db')
 
 
-local_file = "./utils/travel.db"
+local_file = "./utils/travel2.sqlite"
 backup_file = "./utils/travel_backup.db"
 
 # Backup my database
