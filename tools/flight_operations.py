@@ -10,7 +10,7 @@ db = '../utils/travel2.sqlite'
 
 
 @tool
-def fetch_user_flight_info(config: RunnableConfig) -> list[dict]:
+def fetch_user_flight_information(config: RunnableConfig) -> list[dict]:
     """Fetch all tickets for the user along with corresponding flight information and seat assignments.
 
     Returns:
